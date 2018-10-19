@@ -25,24 +25,35 @@
 </style>
 
 <script>
+var axios = require('axios')
+
 export default {
   data: function() {
     return {
-      tasks: [
-        {text: "Take out the papers", completed: false},
-        {text: "Take out the trash", completed: false},
-        {text: "Spend all that spending cash", completed: false}
-      ],
+      tasks: [],
       newTask: {text: '', completed: false}
     };
   },
-  created: function() {},
+  created: function() {
+    axios
+    .get("http://localhost:3000/api/tasks")
+    .then(function(response) {
+      this.tasks = response.data
+    }.bind(this))
+  },
   methods: {
     addTask: function() {
-      if (this.newTask.text !== "") {
+      var params = {
+                    text: this.newTask.text
+                   };
+
+      axios
+      .post("http://localhost:3000/api/tasks",params)
+      .then(function(response) {
         this.tasks.push(this.newTask);
-        this.newTask = {text: "", completed: false};
-      }
+      }.bind(this));
+      
+      this.newTask = {text: "", completed: false};
     },
     completeTask: function(inputTask) {
       inputTask.completed = !inputTask.completed;
