@@ -12,15 +12,64 @@
       <h5>{{ numberOfIncompleteTasks() }} tasks left</h5>
       <button @click="removeCompleted()">Clear Completed Tasks</button>
     </div>
-    <ul>
-      <li v-for="task in tasks" v-bind:class="{strike: task.completed}" v-on:click="completeTask(task)">{{ task.text }}</li>
-    </ul>
+    
+    <div>
+      Search: <input v-model="textFilter". list="texts">
+      <datalist id="texts">
+        <option v-for="task in tasks">{{ task.text }}</option>
+      </datalist>
+    </div>
+
+    <div>
+      <button @click="setSortAttribute('text')">Sort by Text</button>
+    </div>
+
+
+    <transition-group name="fade">
+      <ul>
+      <li v-for="task in tasks"  v-bind:key="task.id" v-bind:class="{strike: task.completed}" v-on:click="completeTask(task)">{{ task.text }}</li>
+      </ul>
+    </transition-group>
+
+    
   </div>
 </template>
 
 <style>
 .strike {
   text-decoration: line-through;
+}
+
+/* Vue.js fade */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0
+}
+
+/* Vue.js slide-right */
+.slide-right-enter-active {
+  transition: all .3s ease;
+}
+.slide-right-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-right-enter, .slide-right-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+}
+
+/* Vue.js slide-left */
+.slide-left-enter-active {
+  transition: all .3s ease;
+}
+.slide-left-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-left-enter, .slide-left-leave-to {
+  transform: translateX(-10px);
+  opacity: 0;
 }
 </style>
 
@@ -31,7 +80,10 @@ export default {
   data: function() {
     return {
       tasks: [],
-      newTask: {text: '', completed: false}
+      newTask: {text: '', completed: false},
+      textFilter: "",
+      sortAttribute: 'text',
+      sortOrder: 1
     };
   },
   created: function() {
@@ -76,6 +128,14 @@ export default {
         }
       }
       this.tasks = incompleteTasks;
+    },
+    setSortAttribute: function(inputAttribute) {
+      if (this.sortAttribute === inputAttribute) {
+        this.sortOrder = this.sortOrder * -1;
+      } else {
+        this.sortOrder = 1;
+      }
+      this.sortAttribute = inputAttribute;
     }
   },
   computed: {}
